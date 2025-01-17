@@ -1,6 +1,6 @@
 from pyrogram import Client, filters
 from pytgcalls import PyTgCalls
-from pytgcalls.types import MediaStream  # MediaStream istifadə edin
+from pytgcalls.types import MediaStream
 from youtube_search import YoutubeSearch
 import yt_dlp
 import logging
@@ -49,17 +49,26 @@ async def play(_, message):
         "outtmpl": "downloads/%(title)s.%(ext)s",
         "quiet": True
     }
-    with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-        info = ydl.extract_info(video_url, download=True)
-        audio_file = ydl.prepare_filename(info)
+    try:
+        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+            info = ydl.extract_info(video_url, download=True)
+            audio_file = ydl.prepare_filename(info)
+    except Exception as e:
+        logger.error(f"Yükləmə zamanı səhv baş verdi: {e}")
+        await message.reply("Mahnı yüklənərkən səhv baş verdi.")
+        return
 
     # Səsli söhbətə qoşulun, əlaqə artıq varsa, qoşulmaya cəhd etməyin
     if not vc.is_connected(message.chat.id):
-        # Audio faylını AudioStream ilə ötürün
-        await vc.join_group_call(
-            message.chat.id,
-            MediaStream(audio_file)  # AudioPiped -> AudioStream
-        )
+        try:
+            await vc.join_group_call(
+                message.chat.id,
+                MediaStream(audio_file)  # AudioPiped -> MediaStream
+            )
+        except Exception as e:
+            logger.error(f"Səsli söhbətə qoşulma zamanı səhv baş verdi: {e}")
+            await message.reply("Səsli söhbətə qoşulma zamanı səhv baş verdi.")
+            return
     else:
         await message.reply("Zatən səsli söhbətə qoşulmusunuz.")
     await message.reply("Mahnı oynanır.")
