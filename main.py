@@ -3,6 +3,11 @@ from pytgcalls import PyTgCalls
 from pytgcalls.types.input_stream import AudioPiped
 from youtube_search import YoutubeSearch
 import yt_dlp
+import logging
+
+# Logging konfiqurasiyası
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 # Bot parametrləri
 api_id = "28603118"
