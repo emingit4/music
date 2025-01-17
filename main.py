@@ -1,6 +1,6 @@
 from pyrogram import Client, filters
 from pytgcalls import PyTgCalls
-from pytgcalls.types import AudioStream
+from pytgcalls.types import MediaStream  # MediaStream istifadə edin
 from youtube_search import YoutubeSearch
 import yt_dlp
 import logging
