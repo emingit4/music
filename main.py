@@ -1,7 +1,7 @@
 from pyrogram import Client, filters
 from pytgcalls import PyTgCalls
 from pytgcalls.types import AudioPiped
-from youtube_search import YoutubeSearch
+from youtube_search import YoutubeSearch  # Bu xətt əlavə edildi
 import yt_dlp
 import logging
 
