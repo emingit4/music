@@ -1,6 +1,6 @@
 from pyrogram import Client, filters
 from pytgcalls import PyTgCalls
-from pytgcalls.types import AudioPiped
+from pytgcalls.types import AudioStream  # AudioPiped əvəzinə AudioStream
 from youtube_search import YoutubeSearch
 import yt_dlp
 import logging
@@ -56,7 +56,7 @@ async def play(_, message):
     if not vc.is_connected(message.chat.id):
         await vc.join_group_call(
             message.chat.id,
-            AudioPiped(audio_file)
+            AudioStream(audio_file)  # AudioPiped əvəzinə AudioStream istifadə olunmalıdır
         )
     else:
         await message.reply("Zatən səsli söhbətə qoşulmusunuz.")
