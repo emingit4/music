@@ -2,3 +2,4 @@ pyrogram==2.0.106
 py-tgcalls
 youtube-search-python==1.6.6
 yt-dlp==2023.7.6
+TgCrypto
