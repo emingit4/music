@@ -1,4 +1,5 @@
 pyrogram==2.0.106
-pytgcalls==2.1.0
+pytgcalls==2.0.0.dev4
 youtube-search-python==1.6.6
 yt-dlp==2023.7.6
+tgcalls==3.0.0.dev5
