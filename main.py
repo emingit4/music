@@ -1,6 +1,6 @@
 from pyrogram import Client, filters
 from pytgcalls import PyTgCalls
-from pytgcalls.types import AudioPiped  # AudioPiped-in doğru istifadə edilməsi
+from pytgcalls.types import AudioStream  # AudioPiped-in doğru istifadə edilməsi
 from youtube_search import YoutubeSearch
 import yt_dlp
 import logging
