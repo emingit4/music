@@ -27,6 +27,7 @@ def search_youtube(query):
 
 @app.on_message(filters.command("play"))
 async def play(_, message):
+    logger.info("Play əmri alındı.")  # Loq mesajı əlavə etdim
     if not message.chat.type in ["supergroup", "group"]:
         await message.reply("Bu əmri yalnız qrupda istifadə edə bilərsiniz.")
         return
@@ -62,16 +63,19 @@ async def play(_, message):
     else:
         await message.reply("Zatən səsli söhbətə qoşulmusunuz.")
     await message.reply("Mahnı oynanır.")
+    logger.info("Mahnı oynanmağa başladı.")  # Mahnı başladı mesajı
 
 @app.on_message(filters.command("stop"))
 async def stop(_, message):
     await vc.leave_group_call(message.chat.id)
     await message.reply("Mahnı dayandırıldı.")
+    logger.info("Bot səsli söhbəti tərk etdi.")  # Stop əmri işlədiyi zaman loq mesajı
 
 # `app.run()` yalnız bir dəfə çağırılmalıdır
 async def start_bot():
     await app.start()  # Pyrogram-a qoşulma
     await vc.start()   # PyTgCalls-ı başlatma
+    logger.info("Bot başladı.")  # Bot başlatma loqu
 
 # Botu başlat
 app.run(start_bot())  # Bu üsul əlaqəni düzgün idarə edəcək
