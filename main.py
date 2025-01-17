@@ -1,7 +1,7 @@
 from pyrogram import Client, filters
 from pytgcalls import PyTgCalls
 from pytgcalls.types import AudioPiped
-from youtube_search import YoutubeSearch  # Bu xətt əlavə edildi
+from youtube_search import YoutubeSearch
 import yt_dlp
 import logging
 
@@ -52,11 +52,14 @@ async def play(_, message):
         info = ydl.extract_info(video_url, download=True)
         audio_file = ydl.prepare_filename(info)
 
-    # Səsli söhbətə qoşulun
-    await vc.join_group_call(
-        message.chat.id,
-        AudioPiped(audio_file)  # Burada AudioPiped modulu istifadə olunur
-    )
+    # Səsli söhbətə qoşulun, əlaqə artıq varsa, qoşulmaya cəhd etməyin
+    if not vc.is_connected(message.chat.id):
+        await vc.join_group_call(
+            message.chat.id,
+            AudioPiped(audio_file)
+        )
+    else:
+        await message.reply("Zatən səsli söhbətə qoşulmusunuz.")
     await message.reply("Mahnı oynanır.")
 
 @app.on_message(filters.command("stop"))
@@ -64,5 +67,6 @@ async def stop(_, message):
     await vc.leave_group_call(message.chat.id)
     await message.reply("Mahnı dayandırıldı.")
 
-vc.start()
-app.run()
+# `app.run()` yalnız bir dəfə çağırılmalıdır
+vc.start()  # Bu sətir artıq `app.run()` ilə əlaqə qurur
+app.run()  # Yalnız bir dəfə çağırın
