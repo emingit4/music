@@ -69,8 +69,10 @@ async def stop(_, message):
 
 # `app.run()` yalnız bir dəfə çağırılmalıdır
 async def start_bot():
-    await app.start()  # Pyrogram-a qoşulma
-    await vc.start()   # PyTgCalls-ı başlatma
+    if not app.is_connected:
+        await app.start()  # Pyrogram-a qoşulma
+    if not vc.is_connected:
+        await vc.start()   # PyTgCalls-ı başlatma
 
 # Botu başlat
 app.run(start_bot())  # Bu üsul əlaqəni düzgün idarə edəcək
