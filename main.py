@@ -1,6 +1,6 @@
 from pyrogram import Client, filters
 from pytgcalls import PyTgCalls
-from pytgcalls.types import AudioStream  # AudioPiped-in doğru istifadə edilməsi
+from pytgcalls.types import AudioStream
 from youtube_search import YoutubeSearch
 import yt_dlp
 import logging
@@ -53,27 +53,20 @@ async def play(_, message):
         audio_file = ydl.prepare_filename(info)
 
     # Səsli söhbətə qoşulun, əlaqə artıq varsa, qoşulmaya cəhd etməyin
-    try:
-        if not vc.is_connected(message.chat.id):
-            await vc.join_group_call(
-                message.chat.id,
-                AudioPiped(audio_file)  # AudioPiped düzgün istifadə olunmalıdır
-            )
-        else:
-            await message.reply("Zatən səsli söhbətə qoşulmusunuz.")
-        await message.reply("Mahnı oynanır.")
-    except Exception as e:
-        await message.reply(f"Xəta baş verdi: {str(e)}")
-        logger.error(f"Error: {str(e)}")
+    if not vc.is_connected(message.chat.id):
+        # Audio faylını AudioStream ilə ötürün
+        await vc.join_group_call(
+            message.chat.id,
+            AudioStream(audio_file)  # AudioPiped -> AudioStream
+        )
+    else:
+        await message.reply("Zatən səsli söhbətə qoşulmusunuz.")
+    await message.reply("Mahnı oynanır.")
 
 @app.on_message(filters.command("stop"))
 async def stop(_, message):
-    try:
-        await vc.leave_group_call(message.chat.id)
-        await message.reply("Mahnı dayandırıldı.")
-    except Exception as e:
-        await message.reply(f"Xəta baş verdi: {str(e)}")
-        logger.error(f"Error: {str(e)}")
+    await vc.leave_group_call(message.chat.id)
+    await message.reply("Mahnı dayandırıldı.")
 
 # `app.run()` yalnız bir dəfə çağırılmalıdır
 async def start_bot():
