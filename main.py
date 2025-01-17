@@ -57,7 +57,7 @@ async def play(_, message):
         # Audio faylını AudioStream ilə ötürün
         await vc.join_group_call(
             message.chat.id,
-            AudioStream(audio_file)  # AudioPiped -> AudioStream
+            MediaStream(audio_file)  # AudioPiped -> AudioStream
         )
     else:
         await message.reply("Zatən səsli söhbətə qoşulmusunuz.")
