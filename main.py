@@ -1,5 +1,5 @@
 from pyrogram import Client, filters
-from py_tgcalls import PyTgCalls
+from pytgcalls import PyTgCalls
 from py_tgcalls.types.input_stream import AudioPiped
 from youtube_search import YoutubeSearch
 import yt_dlp
