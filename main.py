@@ -1,6 +1,6 @@
 from pyrogram import Client, filters
 from pytgcalls import PyTgCalls
-from pytgcalls.types.input_stream import Audio
+from pytgcalls.stream import AudioPiped
 from youtube_search import YoutubeSearch
 import yt_dlp
 import logging
@@ -55,7 +55,7 @@ async def play(_, message):
     # Səsli söhbətə qoşulun
     await vc.join_group_call(
         message.chat.id,
-        Audio(audio_file)  # Burada AudioPiped yerine Audio istifadə edin
+        AudioPiped(audio_file)  # Burada AudioPiped modulu istifadə olunur
     )
     await message.reply("Mahnı oynanır.")
 
