@@ -4,3 +4,4 @@ youtube-search
 yt-dlp>=2025.1.15
 tgcrypto==1.2.5
 google-api-python-client
+ffmpeg
