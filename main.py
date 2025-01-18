@@ -1,3 +1,4 @@
+from pyrogram import idle
 from pyrogram import Client, filters
 from pytgcalls import PyTgCalls
 from pytgcalls.types import MediaStream
