@@ -1,11 +1,10 @@
-from pyrogram import idle, Client, filters
-from pyrogram.enums import ChatType
+from pyrogram import Client, filters
 from pytgcalls import PyTgCalls
 from pytgcalls.types import MediaStream
 from googleapiclient.discovery import build
 import yt_dlp
 import logging
-import asyncio
+import os
 
 # Logging configuration
 logging.basicConfig(level=logging.INFO)
@@ -32,26 +31,30 @@ def search_youtube(query):
         q=query
     )
     response = request.execute()
-    
+
     if 'items' in response and len(response['items']) > 0:
         video_id = response['items'][0]['id']['videoId']
         video_url = f"https://www.youtube.com/watch?v={video_id}"
         return video_url
     return None
 
-@app.on_message(filters.command("start"))
-async def start(_, message):
-    await message.reply("Bot başlatıldı və hazırdır!")
-    logger.info("Start əmri alındı və bot başlatıldı.")  # Start əmri alındıqda loq mesajı
+def download_video(video_url):
+    ydl_opts = {
+        "format": "bestaudio/best",
+        "outtmpl": "downloads/%(id)s.%(ext)s",  # Yüklənmiş musiqinin fayl yolu
+        "quiet": True,
+    }
+    try:
+        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+            info = ydl.extract_info(video_url, download=True)
+            audio_file = ydl.prepare_filename(info)
+            return audio_file
+    except Exception as e:
+        logger.error(f"Yükləmə zamanı səhv baş verdi: {e}")
+        return None
 
 @app.on_message(filters.command("play"))
 async def play(_, message):
-    # Yalnız qrup və superqruplarda işləsin
-    logger.info(f"Chat type: {message.chat.type}")  # Chat type loqu əlavə etdim
-    if message.chat.type not in [ChatType.GROUP, ChatType.SUPERGROUP]:
-        await message.reply("Bu əmri yalnız qrupda istifadə edə bilərsiniz.")
-        return
-
     if len(message.command) < 2:
         await message.reply("Zəhmət olmasa, mahnının adını yazın.")
         return
@@ -62,56 +65,40 @@ async def play(_, message):
         await message.reply("Mahnı tapılmadı.")
         return
 
-    # Mahnını yükləyin
-    await message.reply(f"Mahnı tapıldı: {video_url}. Yüklənir...")
-    ydl_opts = {
-        "format": "bestaudio/best",
-        "outtmpl": "downloads/%(title)s.%(ext)s",
-        "quiet": True,
-        "nocheckcertificate": True,  # Sertifikat yoxlanışını keçmək üçün əlavə edildi
-        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"  # Daha uzun user-agent əlavə edildi
-    }
-    try:
-        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-            info = ydl.extract_info(video_url, download=True)
-            audio_file = ydl.prepare_filename(info)
-    except Exception as e:
-        logger.error(f"Yükləmə zamanı səhv baş verdi: {e}")
+    audio_file = download_video(video_url)
+    if not audio_file:
         await message.reply("Mahnı yüklənərkən səhv baş verdi.")
         return
 
-    # Səsli söhbətə qoşulun, əlaqə artıq varsa, qoşulmaya cəhd etməyin
     if not vc.is_connected(message.chat.id):
         try:
             await vc.join_group_call(
                 message.chat.id,
-                MediaStream(audio_file)  # AudioPiped -> MediaStream
+                MediaStream(audio_file)  # Audio faylı ilə MediaStream əlavə edilir
             )
+            await message.reply("Mahnı oynanır.")
         except Exception as e:
             logger.error(f"Səsli söhbətə qoşulma zamanı səhv baş verdi: {e}")
             await message.reply("Səsli söhbətə qoşulma zamanı səhv baş verdi.")
             return
     else:
         await message.reply("Zatən səsli söhbətə qoşulmusunuz.")
-    await message.reply("Mahnı oynanır.")
-    logger.info("Mahnı oynanmağa başladı.")  # Mahnı başladı mesajı
 
 @app.on_message(filters.command("stop"))
 async def stop(_, message):
     await vc.leave_group_call(message.chat.id)
     await message.reply("Mahnı dayandırıldı.")
-    logger.info("Bot səsli söhbəti tərk etdi.")  # Stop əmri işlədiyi zaman loq mesajı
+    logger.info("Bot səsli söhbəti tərk etdi.")
 
-# `app.run()` yalnız bir dəfə çağırılmalıdır
 async def start_bot():
     try:
         await app.start()  # Pyrogram-a qoşulma
         await vc.start()   # PyTgCalls-ı başlatma
-        logger.info("Bot başladı.")  # Bot başlatma loqu
-        await idle()  # Botun dayanmaması üçün
+        logger.info("Bot başladı.")
+        await app.idle()  # Botun dayanmaması üçün
     except Exception as e:
         logger.error(f"Botun başlaması zamanı səhv baş verdi: {e}")
 
 # Botu başlat
 if __name__ == "__main__":
-    app.run(start_bot())  # Bu üsul əlaqəni düzgün idarə edəcək
+    app.run(start_bot())
