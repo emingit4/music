@@ -14,7 +14,7 @@ logger = logging.getLogger(__name__)
 # Bot parametrləri
 api_id = "28603118"
 api_hash = "35a400855835510c0a926f1e965aa12d"
-bot_token = "5357718486:AAHfrnYo0sfPNGwBMghVeSd8bTnvXXKckcA"
+bot_token = "5347650033:AAHANE4nPgPOP_SqWo1BtajRea6zyBORwJ4"
 
 app = Client("music_bot", api_id=api_id, api_hash=api_hash, bot_token=bot_token)
 vc = PyTgCalls(app)
@@ -34,8 +34,8 @@ async def start(_, message):
 
 @app.on_message(filters.command("play"))
 async def play(_, message):
-    logger.info("Play əmri alındı.")  # Loq mesajı əlavə etdim
     # Yalnız qrup və superqruplarda işləsin
+    logger.info(f"Chat type: {message.chat.type}")  # Chat type loqu əlavə etdim
     if message.chat.type not in ["group", "supergroup"]:
         await message.reply("Bu əmri yalnız qrupda istifadə edə bilərsiniz.")
         return
@@ -81,7 +81,6 @@ async def play(_, message):
         await message.reply("Zatən səsli söhbətə qoşulmusunuz.")
     await message.reply("Mahnı oynanır.")
     logger.info("Mahnı oynanmağa başladı.")  # Mahnı başladı mesajı
-
 
 @app.on_message(filters.command("stop"))
 async def stop(_, message):
