@@ -4,6 +4,7 @@ from pytgcalls.types import MediaStream
 from youtube_search import YoutubeSearch
 import yt_dlp
 import logging
+import asyncio
 
 # Logging konfiqurasiyası
 logging.basicConfig(level=logging.INFO)
@@ -87,9 +88,14 @@ async def stop(_, message):
 
 # `app.run()` yalnız bir dəfə çağırılmalıdır
 async def start_bot():
-    await app.start()  # Pyrogram-a qoşulma
-    await vc.start()   # PyTgCalls-ı başlatma
-    logger.info("Bot başladı.")  # Bot başlatma loqu
+    try:
+        await app.start()  # Pyrogram-a qoşulma
+        await vc.start()   # PyTgCalls-ı başlatma
+        logger.info("Bot başladı.")  # Bot başlatma loqu
+        await idle()  # Botun dayanmaması üçün
+    except Exception as e:
+        logger.error(f"Botun başlaması zamanı səhv baş verdi: {e}")
 
 # Botu başlat
-app.run(start_bot())  # Bu üsul əlaqəni düzgün idarə edəcək
+if __name__ == "__main__":
+    app.run(start_bot())  # Bu üsul əlaqəni düzgün idarə edəcək
