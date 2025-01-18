@@ -55,7 +55,8 @@ async def play(_, message):
     ydl_opts = {
         "format": "bestaudio/best",
         "outtmpl": "downloads/%(title)s.%(ext)s",
-        "quiet": True
+        "quiet": True,
+        "nocheckcertificate": True,  # Sertifikat yoxlanışını keçmək üçün əlavə edildi
     }
     try:
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
