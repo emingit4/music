@@ -34,10 +34,11 @@ async def start(_, message):
 
 @app.on_message(filters.command("play"))
 async def play(_, message):
-    logger.info("Play əmri alındı.")  # Loq mesajı əlavə etdim
-    if not message.chat.type in ["supergroup", "group"]:
-        await message.reply("Bu əmri yalnız qrupda istifadə edə bilərsiniz.")
-        return
+    # Yalnız qrup və superqruplarda işləsin
+    if message.chat.type not in ["group", "supergroup"]:
+        return  # Cavab vermədən sadəcə heç nə etmə
+
+    # Əmrin qalan hissəsi burada
 
     if len(message.command) < 2:
         await message.reply("Zəhmət olmasa, mahnının adını yazın.")
