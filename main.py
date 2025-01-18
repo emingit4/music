@@ -39,22 +39,26 @@ def search_youtube(query):
     return None
 
 def download_video(url):
-    # yt-dlp parametrləri
+    # Ensure the downloads directory exists
+    if not os.path.exists('downloads'):
+        os.makedirs('downloads')
+
+    # yt-dlp parameters
     ydl_opts = {
-        'format': 'bestaudio/best',  # Yalnız ən yaxşı audio keyfiyyətini seç
-        'outtmpl': 'downloads/%(title)s.%(ext)s',  # Faylın adını və yeri
-        'noplaylist': True,  # Playlistləri yükləməmək
-        'quiet': True,  # Konsolda yalnız zəruri məlumatları göstər
-        'nocheckcertificate': True,  # Sertifikat yoxlamasını keç
-        'no_warnings': True,  # Xətaları gizlət
+        'format': 'bestaudio/best',  # Select the best audio quality
+        'outtmpl': 'downloads/%(title)s.%(ext)s',  # File name and location
+        'noplaylist': True,  # Do not download playlists
+        'quiet': True,  # Only show necessary information in the console
+        'nocheckcertificate': True,  # Skip certificate check
+        'no_warnings': True,  # Suppress warnings
         'postprocessors': [{
-            'key': 'FFmpegAudio',  # Yalnız audio fayl formatı
-            'preferredcodec': 'mp3',  # Audio faylının formatı
-            'preferredquality': '192',  # Audio keyfiyyəti
+            'key': 'FFmpegExtractAudio',  # Use FFmpeg to extract audio
+            'preferredcodec': 'mp3',  # Audio file format
+            'preferredquality': '192',  # Audio quality
         }],
     }
 
-    # yt-dlp ilə video yükləmək
+    # Download video with yt-dlp
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
         ydl.download([url])
 
@@ -70,16 +74,16 @@ async def play(_, message):
         await message.reply("Mahnı tapılmadı.")
         return
 
-    download_video(video_url)  # Musiqi yükləmək üçün əlavə edilib
+    download_video(video_url)  # Download the music
 
-    # Audio faylı yolunu tapın
-    audio_file = f"downloads/{query}.mp3"  # Burada faylın doğru yolda olduğunu təsdiqləyin
+    # Find the path of the audio file
+    audio_file = f"downloads/{query}.mp3"  # Ensure this path is correct
 
     if not vc.is_connected(message.chat.id):
         try:
             await vc.join_group_call(
                 message.chat.id,
-                MediaStream(audio_file)  # Audio faylı ilə MediaStream əlavə edilir
+                MediaStream(audio_file)  # Add MediaStream with the audio file
             )
             await message.reply("Mahnı oynanır.")
         except Exception as e:
@@ -97,13 +101,13 @@ async def stop(_, message):
 
 async def start_bot():
     try:
-        await app.start()  # Pyrogram-a qoşulma
-        await vc.start()   # PyTgCalls-ı başlatma
+        await app.start()  # Connect to Pyrogram
+        await vc.start()   # Start PyTgCalls
         logger.info("Bot başladı.")
-        await app.idle()  # Botun dayanmaması üçün
+        await app.idle()  # Keep the bot running
     except Exception as e:
         logger.error(f"Botun başlaması zamanı səhv baş verdi: {e}")
 
-# Botu başlat
+# Start the bot
 if __name__ == "__main__":
-    app.run()  # Pyrogram-ı başlatmaq və botu işə salmaq üçün bu koda uyğunlaşdir onu
+    app.run()
