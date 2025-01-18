@@ -25,6 +25,11 @@ def search_youtube(query):
         return video_url
     return None
 
+@app.on_message(filters.command("start"))
+async def start(_, message):
+    await message.reply("Bot başlatıldı və hazırdır!")
+    logger.info("Start əmri alındı və bot başlatıldı.")  # Start əmri alındıqda loq mesajı
+
 @app.on_message(filters.command("play"))
 async def play(_, message):
     logger.info("Play əmri alındı.")  # Loq mesajı əlavə etdim
