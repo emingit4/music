@@ -2,16 +2,16 @@ from pyrogram import idle, Client, filters
 from pyrogram.enums import ChatType
 from pytgcalls import PyTgCalls
 from pytgcalls.types import MediaStream
-from youtube_search import YoutubeSearch
+from googleapiclient.discovery import build
 import yt_dlp
 import logging
 import asyncio
 
-# Logging konfiqurasiyası
+# Logging configuration
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# Bot parametrləri
+# Bot parameters
 api_id = "28603118"
 api_hash = "35a400855835510c0a926f1e965aa12d"
 bot_token = "5357718486:AAG3bxaqLvPUBxPvvv46DQYfBCj7aQuwDTE"
@@ -19,11 +19,23 @@ bot_token = "5357718486:AAG3bxaqLvPUBxPvvv46DQYfBCj7aQuwDTE"
 app = Client("music_bot", api_id=api_id, api_hash=api_hash, bot_token=bot_token)
 vc = PyTgCalls(app)
 
-# YouTube-dan link əldə etmək üçün funksiya
+# YouTube API key
+API_KEY = 'AIzaSyA8rNaOWHqOfPW2_EVnzKBhCkc2dIJ5tX8'
+
+# Create YouTube Data API client
+youtube = build('youtube', 'v3', developerKey=API_KEY)
+
 def search_youtube(query):
-    results = YoutubeSearch(query, max_results=1).to_dict()
-    if results:
-        video_url = f"https://www.youtube.com{results[0]['url_suffix']}"
+    request = youtube.search().list(
+        part="snippet",
+        maxResults=1,
+        q=query
+    )
+    response = request.execute()
+    
+    if 'items' in response and len(response['items']) > 0:
+        video_id = response['items'][0]['id']['videoId']
+        video_url = f"https://www.youtube.com/watch?v={video_id}"
         return video_url
     return None
 
