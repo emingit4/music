@@ -1,5 +1,5 @@
-from pyrogram import idle
-from pyrogram import Client, filters
+from pyrogram import idle, Client, filters
+from pyrogram.enums import ChatType
 from pytgcalls import PyTgCalls
 from pytgcalls.types import MediaStream
 from youtube_search import YoutubeSearch
@@ -14,7 +14,7 @@ logger = logging.getLogger(__name__)
 # Bot parametrləri
 api_id = "28603118"
 api_hash = "35a400855835510c0a926f1e965aa12d"
-bot_token = "5357718486:AAHfrnYo0sfPNGwBMghVeSd8bTnvXXKckcA"
+bot_token = "5347650033:AAHANE4nPgPOP_SqWo1BtajRea6zyBORwJ4"
 
 app = Client("music_bot", api_id=api_id, api_hash=api_hash, bot_token=bot_token)
 vc = PyTgCalls(app)
@@ -36,7 +36,7 @@ async def start(_, message):
 async def play(_, message):
     # Yalnız qrup və superqruplarda işləsin
     logger.info(f"Chat type: {message.chat.type}")  # Chat type loqu əlavə etdim
-    if message.chat.type not in ["group", "supergroup"]:
+    if message.chat.type not in [ChatType.GROUP, ChatType.SUPERGROUP]:
         await message.reply("Bu əmri yalnız qrupda istifadə edə bilərsiniz.")
         return
 
