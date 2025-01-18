@@ -38,20 +38,25 @@ def search_youtube(query):
         return video_url
     return None
 
-def download_video(video_url):
+def download_video(url):
+    # yt-dlp parametrləri
     ydl_opts = {
-        "format": "bestaudio/best",
-        "outtmpl": "downloads/%(id)s.%(ext)s",  # Yüklənmiş musiqinin fayl yolu
-        "quiet": True,
+        'format': 'bestaudio/best',  # Yalnız ən yaxşı audio keyfiyyətini seç
+        'outtmpl': 'downloads/%(title)s.%(ext)s',  # Faylın adını və yeri
+        'noplaylist': True,  # Playlistləri yükləməmək
+        'quiet': True,  # Konsolda yalnız zəruri məlumatları göstər
+        'nocheckcertificate': True,  # Sertifikat yoxlamasını keç
+        'no_warnings': True,  # Xətaları gizlət
+        'postprocessors': [{
+            'key': 'FFmpegAudio',  # Yalnız audio fayl formatı
+            'preferredcodec': 'mp3',  # Audio faylının formatı
+            'preferredquality': '192',  # Audio keyfiyyəti
+        }],
     }
-    try:
-        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-            info = ydl.extract_info(video_url, download=True)
-            audio_file = ydl.prepare_filename(info)
-            return audio_file
-    except Exception as e:
-        logger.error(f"Yükləmə zamanı səhv baş verdi: {e}")
-        return None
+
+    # yt-dlp ilə video yükləmək
+    with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+        ydl.download([url])
 
 @app.on_message(filters.command("play"))
 async def play(_, message):
@@ -65,10 +70,10 @@ async def play(_, message):
         await message.reply("Mahnı tapılmadı.")
         return
 
-    audio_file = download_video(video_url)
-    if not audio_file:
-        await message.reply("Mahnı yüklənərkən səhv baş verdi.")
-        return
+    download_video(video_url)  # Musiqi yükləmək üçün əlavə edilib
+
+    # Audio faylı yolunu tapın
+    audio_file = f"downloads/{query}.mp3"  # Burada faylın doğru yolda olduğunu təsdiqləyin
 
     if not vc.is_connected(message.chat.id):
         try:
@@ -101,4 +106,4 @@ async def start_bot():
 
 # Botu başlat
 if __name__ == "__main__":
-    app.run()  # Pyrogram-ı başlatmaq və botu işə salmaq üçün
+    app.run()  # Pyrogram-ı başlatmaq və botu işə salmaq üçün bu koda uyğunlaşdir onu
