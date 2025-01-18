@@ -101,4 +101,4 @@ async def start_bot():
 
 # Botu başlat
 if __name__ == "__main__":
-    app.run(start_bot())
+    app.run()  # Pyrogram-ı başlatmaq və botu işə salmaq üçün
