@@ -14,7 +14,7 @@ logger = logging.getLogger(__name__)
 # Bot parametrləri
 api_id = "28603118"
 api_hash = "35a400855835510c0a926f1e965aa12d"
-bot_token = "5347650033:AAHANE4nPgPOP_SqWo1BtajRea6zyBORwJ4"
+bot_token = "5357718486:AAG3bxaqLvPUBxPvvv46DQYfBCj7aQuwDTE"
 
 app = Client("music_bot", api_id=api_id, api_hash=api_hash, bot_token=bot_token)
 vc = PyTgCalls(app)
